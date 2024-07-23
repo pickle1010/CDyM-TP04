@@ -1,0 +1,26 @@
+# Ignore build artifacts
+*.o
+*.d
+*.elf
+*.hex
+*.eep
+*.lss
+*.map
+*.srec
+*.bin
+
+# Ignore backup files
+*.bak
+*.backup
+Project Backups/
+*.autosave
+
+# Ignore IDE-specific files
+.vs/
+*.workspace
+
+# Ignore log files
+*.log
+
+# Ignore any directory named Debug (case-sensitive)
+Debug/
