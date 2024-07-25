@@ -73,13 +73,12 @@ void RGB_Init(uint8_t initR, uint8_t initG, uint8_t initB)
 	//Configurar modo de operación para generar PWM
 	TCCR1A |= (1<<WGM10) | (1<<WGM12);
 
-	//configurar el preescalador a 1
-	TCCR1B |= (1<<CS10);
+	//configurar el preescalador a 64
+	TCCR1B |= (1<<CS11) | (1<<CS10);
 	
 	// Configuracion de Timer 0 para PWM por software
 	TCCR0A = 0;		// Modo normal
-	TCCR0B = (1 << CS00);	// Prescaler 1
-	//OCR0A = 127;
+	TCCR0B = (1 << CS01) | (1 << CS00);	// Prescaler de 64
 	TIMSK0 = (1 << OCIE0A) | (1 << TOIE0);
 }
 
