@@ -46,14 +46,6 @@ int main(void)
 	
     while (1) 
     {	
-		if(print_req && print_free) 
-		{
-			
-			print_req = 0;
-			print_free = 0;
-			msg = next_msg;
-			SerialPort_TX_Interrupt_Enable();
-		}
     }
 }
 
@@ -64,8 +56,10 @@ void MAIN_init(){
 	SerialPort_RX_Interrupt_Enable();	// Activar Interrupción de recepcion
 	
 	// Configurar mensaje de bienvenida
-	next_msg = startup_msg;
-	print_req = 1;
+	msg = startup_msg;
+	print_req = 0;
+	print_free = 0;
+	SerialPort_TX_Interrupt_Enable();
 	
 	ADC_Init();
 	ADC_Read();
@@ -85,23 +79,37 @@ void MAIN_init(){
 // Rutina de Servicio de Interrupción de Byte Recibido
 ISR(USART_RX_vect)
 {
-	RX_Buffer = UDR0;
-	if(RX_Buffer == 'R')
+	uint8_t temp_buffer = UDR0;
+	if(RX_Buffer != temp_buffer)
 	{
-		color_sel = 0;
-		next_msg = red_msg;
+		RX_Buffer = temp_buffer;
+		if( (RX_Buffer == 'R') | (RX_Buffer == 'G') | (RX_Buffer == 'B') )
+		{
+			if(RX_Buffer == 'R')
+			{
+				color_sel = 0;
+				next_msg = red_msg;
+			}
+			else if(RX_Buffer == 'G')
+			{
+				color_sel = 1;
+				next_msg = green_msg;
+			}
+			else if(RX_Buffer == 'B')
+			{
+				color_sel = 2;
+				next_msg = blue_msg;
+			}
+			print_req = 1;
+			if(print_free)
+			{
+				print_req = 0;
+				print_free = 0;
+				msg = next_msg;
+				SerialPort_TX_Interrupt_Enable();
+			}
+		}	
 	}
-	else if(RX_Buffer == 'G')
-	{
-		color_sel = 1;
-		next_msg = green_msg;
-	}
-	else if(RX_Buffer == 'B')
-	{
-		color_sel = 2;
-		next_msg = blue_msg;
-	}
-	print_req = 1;
 }
 
 ISR(USART_UDRE_vect)
@@ -114,8 +122,16 @@ ISR(USART_UDRE_vect)
 	else
 	{
 		msg_index = 0;
-		SerialPort_TX_Interrupt_Disable();
-		print_free = 1;
+		if(print_req)
+		{
+			msg = next_msg;
+			print_req = 0;
+		}
+		else
+		{
+			SerialPort_TX_Interrupt_Disable();
+			print_free = 1;
+		}
 	}
 }
 
