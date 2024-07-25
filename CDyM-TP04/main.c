@@ -6,7 +6,7 @@
  */ 
 
 #include <avr/io.h>
-
+#include "ADC.h"
 
 int main(void)
 {
