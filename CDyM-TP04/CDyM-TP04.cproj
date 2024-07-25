@@ -129,6 +129,21 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="main.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="RGB.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="RGB.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="serialPort.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="serialPort.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>
