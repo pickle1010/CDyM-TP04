@@ -9,16 +9,16 @@
 #include <avr/interrupt.h>
 
 void MAIN_Init(void);
-void PWM_soft_Init(void);
-void PWM_soft_SetDelta(uint8_t delta);
+void RGB_Init(uint8_t initR, uint8_t initG, uint8_t initB);
+void RGB_SetValues(uint8_t red, uint8_t green, uint8_t blue);
 
-#define PWM_PIN 5			// Pin de salida de la señal PWM
+#define PWM_PIN_R 5			// Pin de salida de la señal PWM
+#define PWM_PIN_G 2			// Pin de salida de la señal PWM
+#define PWM_PIN_B 1			// Pin de salida de la señal PWM
 #define PWM_PORT PORTB		// Puerto de la señal PWM
 
-#define PWM_OFF			PWM_PORT &= ~(1 << PWM_PIN)				// Pone el pin de la señal en bajo
-#define PWM_ON			PWM_PORT |= (1 << PWM_PIN)				// Pone el pin de la señal en alto
-#define PWM_START		*(&PWM_PORT - 1) |= (1 << PWM_PIN)		// Configura el pin de la señal como salida
-#define PWM_INIT_DELTA	0
+#define PWM_SOFT_OFF		PWM_PORT &= ~(1 << PWM_PIN_R)		// Pone el pin de la señal en bajo
+#define PWM_SOFT_ON			PWM_PORT |= (1 << PWM_PIN_R)		// Pone el pin de la señal en alto
 
 int main(void)
 {
@@ -34,45 +34,61 @@ void MAIN_Init()
 	DDRB = (1 << PORTB5);
 	PORTB = 0;
 	
-	PWM_soft_Init();
+	RGB_Init(0, 0, 0);
+	
 	sei();
 }
 
 /****************************************************************
 CONFIGURAR EL TIEMPO DE CAMBIO DENTRO DEL PERIODO DE LA SEÑAL PWM
 ****************************************************************/
-void PWM_soft_SetDelta(uint8_t delta)
+void RGB_SetValues(uint8_t red, uint8_t green, uint8_t blue)
 {
-	OCR0A = delta;
+	OCR0A = red;
+	OCR1B = green;
+	OCR1A = blue;
 }
 
 /********************************************************
 CONFIGURAR TIMER 0 EN MODO NORMAL CON UNA FRECUENCIA 
 DE 16 MHz PARA QUE GENERE UNA INTERUPPCION CUANDO EL
 CONTADOR ALCANZA EL VALOR DE OCR0A (INICIALIZADO EN 
-PWM_INIT_DELTA) Y OTRA CUANDO OCURRE OVERFLOW.
+init_delta) Y OTRA CUANDO OCURRE OVERFLOW.
 
 ADEMAS CONFIGURA EL PIN DE LA SEÑAL PWM COMO SALIDA E
 INICIALIZA EL MISMO EN ALTO PARA USAR EL PWM EN MODO
 NO INVERTIDO.
 ********************************************************/
-void PWM_soft_Init()
+void RGB_Init(uint8_t initR, uint8_t initG, uint8_t initB)
 {
-	TCCR0A = 0; // Modo normal
-	TCCR0B = (1 << CS00); // Prescaler 1
-	OCR0A = PWM_INIT_DELTA;
-	TIMSK0 = (1 << OCIE0A) | (1 << TOIE0);
+	*(&PWM_PORT - 1) |= (1<<PWM_PIN_R) | (1<<PWM_PIN_G) | (1<<PWM_PIN_B);
+	RGB_SetValues(initR, initG, initB);	// Inicializar los valores iniciales para cada color
 	
-	PWM_START;
-	PWM_ON;
+	PWM_SOFT_ON;	// Inicializar pin de PWM por software en alto
+	
+	// TIMER 1
+	//configuro salidas para generar PWM no invertido
+	TCCR1A |= (1<<COM1A1) | (1<<COM1B1);
+
+	//Configurar modo de operación para generar PWM
+	TCCR1A |= (1<<WGM10) | (1<<WGM12);
+
+	//configurar el preescalador a 1
+	TCCR1B |= (1<<CS10);
+	
+	// Configuracion de Timer 0 para PWM por software
+	TCCR0A = 0;		// Modo normal
+	TCCR0B = (1 << CS00);	// Prescaler 1
+	//OCR0A = 127;
+	TIMSK0 = (1 << OCIE0A) | (1 << TOIE0);
 }
 
 ISR(TIMER0_COMPA_vect)
 {	
-	PWM_OFF;
+	PWM_SOFT_OFF;
 }
 
 ISR(TIMER0_OVF_vect)
 {
-	PWM_ON;
+	PWM_SOFT_ON;
 }
