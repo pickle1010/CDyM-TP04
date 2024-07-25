@@ -24,9 +24,11 @@ char startup_msg[] =
 "\r\n"
 "Presione 'R', 'G' o 'B' para setear algun color...\r\n\r\n";
 
-char red_msg[] = "Ajustando proporcion de ROJO\r\n";
-char green_msg[] = "Ajustando proporcion de VERDE\r\n";
-char blue_msg[] = "Ajustando proporcion de AZUL\r\n";
+char* color_msg[3] = {
+	(char *) "Ajustando proporcion de ROJO\r\n",
+	(char *) "Ajustando proporcion de VERDE\r\n",
+	(char *) "Ajustando proporcion de AZUL\r\n"
+};
 
 volatile uint8_t RX_Buffer = 0;		// Almacena el caracter recibido por teclado
 
@@ -57,7 +59,8 @@ void MAIN_init(){
 	
 	// Configurar mensaje de bienvenida
 	msg = startup_msg;
-	print_req = 0;
+	next_msg = color_msg[color_sel];
+	print_req = 1;
 	print_free = 0;
 	SerialPort_TX_Interrupt_Enable();
 	
@@ -88,17 +91,17 @@ ISR(USART_RX_vect)
 			if(RX_Buffer == 'R')
 			{
 				color_sel = 0;
-				next_msg = red_msg;
+				next_msg = color_msg[0];
 			}
 			else if(RX_Buffer == 'G')
 			{
 				color_sel = 1;
-				next_msg = green_msg;
+				next_msg = color_msg[1];
 			}
 			else if(RX_Buffer == 'B')
 			{
 				color_sel = 2;
-				next_msg = blue_msg;
+				next_msg = color_msg[2];
 			}
 			print_req = 1;
 			if(print_free)
