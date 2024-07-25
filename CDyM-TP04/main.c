@@ -69,11 +69,7 @@ void MAIN_init(){
 	ADC_EnableInt();
 	ADC_EnableAT();
 	
-	uint8_t initial_value = ADC_GetData();
-	color_values[0] = initial_value;
-	color_values[1] = initial_value;
-	color_values[2] = initial_value;
-	RGB_Init(initial_value, initial_value, initial_value);
+	RGB_Init(0, 0, 0);
 	
 	sei();
 	ADC_StartConversion();
