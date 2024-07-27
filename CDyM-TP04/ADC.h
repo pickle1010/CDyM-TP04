@@ -12,7 +12,6 @@ void ADC_EnableInt(void);
 void ADC_EnableAT(void);
 
 /*GETTERS-SETTERS*/
-
 uint8_t ADC_GetData(void);
 
 #endif

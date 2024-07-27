@@ -28,9 +28,9 @@ const char* color_msg[3] = {
 	(char *) "Ajustando proporcion de AZUL\r\n"
 };
 
-volatile uint8_t color_values[3] = {0, 0, 0};
-volatile uint8_t color_sel = 0;
-volatile uint8_t last_char = 'R';
+volatile uint8_t color_values[3] = {0, 0, 0};	// Valor de cada color {R, G, B}
+volatile uint8_t color_sel = 0;					// Valor ajustado actualmente
+volatile uint8_t last_char = 'R';				// Ultimo caracter presionado
 
 int main(void)
 {
@@ -50,17 +50,26 @@ void MAIN_init(){
 	// Indicar color ajustado inicialmente
 	TERMINAL_EnqueueMessage(color_msg[color_sel]);
 	
+	// Inicializar ADC. Habilitar su interrupcion y el auto-trigger
 	ADC_Init();
 	ADC_EnableInt();
 	ADC_EnableAT();
 	
+	// Poner todos los colores en su maxima proporcion
 	RGB_Init(0, 0, 0);
 	
 	sei();
 	ADC_StartConversion();
 }
 
-// Rutina de Servicio de Interrupción de Byte Recibido por la terminal
+/***************************************************************************
+	Esta interrupcion recibe el caracter presionado y establece que color se
+	desea ajustar de acuerdo al mismo, ademas de mandar a imprimir el
+	correspondiente aviso en la terminal.
+	
+	Cualquier otra caracter aparte de 'R', 'G' o 'B' no se tiene en cuenta,
+	al igual que cualquier recepcion sucesiva de estos caracteres.
+****************************************************************************/
 ISR(USART_RX_vect)
 {
 	uint8_t received_char = UDR0;
@@ -83,6 +92,15 @@ ISR(USART_RX_vect)
 	}
 }
 
+
+/***************************************************************************
+	Esta interrupcion recibe el caracter presionado y establece que color se
+	desea ajustar de acuerdo al mismo, ademas de mandar a imprimir el
+	correspondiente aviso en la terminal.
+	
+	Cualquier otra caracter aparte de 'R', 'G' o 'B' no se tiene en cuenta,
+	al igual que cualquier recepcion sucesiva de estos caracteres.
+****************************************************************************/
 ISR(ADC_vect)
 {
 	color_values[color_sel] = ADC_GetData();
