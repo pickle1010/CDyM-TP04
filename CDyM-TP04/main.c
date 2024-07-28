@@ -28,9 +28,9 @@ const char* color_msg[3] = {
 	(char *) "Ajustando proporcion de AZUL\r\n"
 };
 
-volatile uint8_t color_values[3] = {0, 0, 0};	// Valor de cada color {R, G, B}
-volatile uint8_t color_sel = 0;					// Valor ajustado actualmente
-volatile uint8_t last_char = 'R';				// Ultimo caracter presionado
+volatile uint8_t color_values[3] = {255, 255, 255};	// Valor de cada color {R, G, B}
+volatile uint8_t color_sel = 0;						// Valor ajustado actualmente
+volatile uint8_t last_char = 'R';					// Ultimo caracter presionado
 
 int main(void)
 {
@@ -55,8 +55,8 @@ void MAIN_init(){
 	ADC_EnableInt();
 	ADC_EnableAT();
 	
-	// Poner todos los colores en su maxima proporcion
-	RGB_Init(0, 0, 0);
+	// Inicializar el led RGB con un color inicial
+	RGB_Init(color_values[0], color_values[1], color_values[2]);
 	
 	sei();
 	ADC_StartConversion();
