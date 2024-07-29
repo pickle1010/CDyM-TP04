@@ -49,6 +49,39 @@ void RGB_SetValues(uint8_t red, uint8_t green, uint8_t blue)
 	OCR0A = red;
 	OCR1B = green;
 	OCR1A = blue;
+	if(red <= 10){
+		TIMSK0 = 0;
+		PWM_SOFT_ON;
+	}
+	else if(red >= 250){
+		TIMSK0 = 0;
+		PWM_SOFT_OFF; 
+	}
+	else{
+		TIMSK0 = (1 << OCIE0A) | (1 << TOIE0);
+	}
+	if(green <= 10){
+		TCCR1A &=~ ((1<<COM1B1) | (1<<COM1B0)) ;
+		PWM_PORT |= (1 << PWM_PIN_G);
+	}
+	else if(green >= 250){
+		TCCR1A &=~ ((1<<COM1B1) | (1<<COM1B0)) ;
+		PWM_PORT &= ~(1 << PWM_PIN_G);
+	}
+	else{
+		TCCR1A |= ((1<<COM1B1) | (1<<COM1B0)) ;
+	}	
+	if(blue <= 10){
+		TCCR1A &=~ ((1<<COM1A1) | (1<<COM1A0)) ;
+		PWM_PORT |= (1 << PWM_PIN_B);
+	}
+	else if(blue>= 250){
+		TCCR1A &=~ ((1<<COM1A1) | (1<<COM1A0)) ;
+		PWM_PORT &= ~(1 << PWM_PIN_B);
+	}
+	else{
+		TCCR1A |= ((1<<COM1A1) | (1<<COM1A0)) ;
+	}
 }
 
 /**********************************************************************
