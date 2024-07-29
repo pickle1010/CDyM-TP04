@@ -30,8 +30,9 @@ void RGB_Init(uint8_t initR, uint8_t initG, uint8_t initB)
 	
 	//	Configurar TIMER 1 para generar PWM invertido por hardware
 	TCCR1A |= (1<<COM1A1) | (1<<COM1A0) | (1<<COM1B1) | (1<<COM1B0);	//	PWM invertido
-	TCCR1A |= (1<<WGM10) | (1<<WGM12);					//	Modo de operación FAST-PWM 8-bit
-	TCCR1B |= (1<<CS11) | (1<<CS10);					//	Establecer prescaler de 64
+	TCCR1A |= (1<<WGM10);												//	Modo de operación FAST-PWM 8-bit
+	TCCR1B |= (1<<WGM12);												//	Modo de operación FAST-PWM 8-bit
+	TCCR1B |= (1<<CS11) | (1<<CS10);									//	Establecer prescaler de 64
 	
 	//	Configurar TIMER 0 para generar PWM invertido por software
 	TCCR0A = 0;								//	Modo de operacion NORMAL
