@@ -49,38 +49,39 @@ void RGB_SetValues(uint8_t red, uint8_t green, uint8_t blue)
 	OCR0A = red;
 	OCR1B = green;
 	OCR1A = blue;
+	
 	if(red <= 10){
-		TIMSK0 = 0;
-		PWM_SOFT_ON;
+		TIMSK0 = 0; //se desactivan las interrupciones del timer
+		PWM_SOFT_ON; //se establece en alto el pin
 	}
 	else if(red >= 250){
-		TIMSK0 = 0;
-		PWM_SOFT_OFF; 
+		TIMSK0 = 0; //se desactivan las interrupciones del timer
+		PWM_SOFT_OFF; //se establece en bajo el pin
 	}
 	else{
-		TIMSK0 = (1 << OCIE0A) | (1 << TOIE0);
+		TIMSK0 = (1 << OCIE0A) | (1 << TOIE0); // Configurar interrupciones del temporizador para generar PWM
 	}
 	if(green <= 10){
-		TCCR1A &=~ ((1<<COM1B1) | (1<<COM1B0)) ;
-		PWM_PORT |= (1 << PWM_PIN_G);
+		TCCR1A &=~ ((1<<COM1B1) | (1<<COM1B0)); // Desactivar salida PWM del temporizador
+		PWM_PORT |= (1 << PWM_PIN_G); // Poner el pin del color verde en alto
 	}
 	else if(green >= 250){
-		TCCR1A &=~ ((1<<COM1B1) | (1<<COM1B0)) ;
-		PWM_PORT &= ~(1 << PWM_PIN_G);
+		TCCR1A &=~ ((1<<COM1B1) | (1<<COM1B0)); // Desactivar salida PWM del temporizador
+		PWM_PORT &= ~(1 << PWM_PIN_G); // Poner el pin del color verde en bajo
 	}
 	else{
-		TCCR1A |= ((1<<COM1B1) | (1<<COM1B0)) ;
-	}	
+		TCCR1A |= ((1<<COM1B1) | (1<<COM1B0)); // Configurar salida PWM del temporizador
+	}
 	if(blue <= 10){
-		TCCR1A &=~ ((1<<COM1A1) | (1<<COM1A0)) ;
-		PWM_PORT |= (1 << PWM_PIN_B);
+		TCCR1A &=~ ((1<<COM1A1) | (1<<COM1A0)); // Desactivar salida PWM del temporizador
+		PWM_PORT |= (1 << PWM_PIN_B); // Poner el pin del color azul en alto
 	}
 	else if(blue>= 250){
-		TCCR1A &=~ ((1<<COM1A1) | (1<<COM1A0)) ;
-		PWM_PORT &= ~(1 << PWM_PIN_B);
+		TCCR1A &=~ ((1<<COM1A1) | (1<<COM1A0)); // Desactivar salida PWM del temporizador
+		PWM_PORT &= ~(1 << PWM_PIN_B); // Poner el pin del color azul en bajo
 	}
 	else{
-		TCCR1A |= ((1<<COM1A1) | (1<<COM1A0)) ;
+		TCCR1A |= ((1<<COM1A1) | (1<<COM1A0)); // Configurar salida PWM del temporizador
 	}
 }
 
